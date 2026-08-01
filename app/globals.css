@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #12233b;
+  --brand: #1173b7;
+  --brand-deep: #07578f;
+  --mist: #f4f8fc;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #fff;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection { background: #b9e4ff; color: var(--ink); }
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-mist: var(--mist);
+}
