@@ -5,6 +5,7 @@
   --brand: #1173b7;
   --brand-deep: #07578f;
   --mist: #f4f8fc;
+  --accent: #0ea5e9;
 }
 
 html { scroll-behavior: smooth; }
@@ -22,4 +23,5 @@ body {
   --color-brand: var(--brand);
   --color-brand-deep: var(--brand-deep);
   --color-mist: var(--mist);
+  --color-accent: var(--accent);
 }

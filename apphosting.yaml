@@ -1,0 +1,36 @@
+# Firebase App Hosting build & runtime configuration.
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+#
+# Runtime scaling — scales to zero when idle, appropriate for a low-traffic
+# solo-developer site. Raise minInstances if you want to avoid cold starts.
+runConfig:
+  minInstances: 0
+  maxInstances: 2
+
+env:
+  # Plain values — safe to commit, not secret.
+  - variable: GMAIL_EMAIL
+    value: dasoftwaresystems@gmail.com
+    availability:
+      - RUNTIME
+
+  - variable: CONTACT_TO_EMAIL
+    value: dasoftwaresystems@gmail.com
+    availability:
+      - RUNTIME
+
+  # TODO: replace with your real App Hosting URL (or custom domain) once the
+  # backend exists — used for the contact API's CORS header.
+  - variable: SITE_URL
+    value: https://dasoftwaresystems.web.app
+    availability:
+      - RUNTIME
+
+  # Secret-backed value. Create it first with:
+  #   firebase apphosting:secrets:set GMAIL_APP_PASSWORD
+  # This only stores a *reference* to the secret, never the value itself —
+  # safe to commit.
+  - variable: GMAIL_APP_PASSWORD
+    secret: GMAIL_APP_PASSWORD
+    availability:
+      - RUNTIME

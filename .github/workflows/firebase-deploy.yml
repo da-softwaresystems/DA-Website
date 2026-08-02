@@ -1,0 +1,103 @@
+name: Firebase App Hosting Deploy
+
+# Solo-developer pipeline: one workflow validates AND deploys. If any step
+# fails, later steps never run — GitHub Actions stops a job at the first
+# non-zero exit by default, so no extra "if: success()" guards are needed.
+on:
+  push:
+    branches:
+      - main
+
+# Cancel an in-progress deploy if a newer push to main lands before it
+# finishes, so we never race two rollouts against each other.
+concurrency:
+  group: firebase-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least-privilege default: this workflow only needs to read the repo.
+permissions:
+  contents: read
+
+env:
+  # The App Hosting backend ID you created with `firebase apphosting:backends:create`.
+  # This is not a secret (it's just a resource name) — replace it with your real backend ID.
+  BACKEND_ID: da-software-systems
+
+jobs:
+  validate-and-deploy:
+    name: Validate & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # 1. Checkout Repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js 22 + 3. Enable npm cache
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      # 4. Install dependencies
+      - name: Install dependencies (npm ci)
+        run: npm ci
+
+      # 5. Run ESLint
+      - name: Run ESLint
+        run: npm run lint
+
+      # 6. Run TypeScript type checking
+      - name: Run TypeScript type check
+        run: npm run typecheck
+
+      # 7. Build Next.js project
+      - name: Build Next.js project
+        run: npm run build
+
+      # 8. Verify build completed successfully
+      - name: Verify build output exists
+        run: |
+          if [ ! -d ".next" ]; then
+            echo "::error::Build did not produce a .next directory — aborting before deploy."
+            exit 1
+          fi
+          echo "Build output verified: .next directory present."
+
+      # Authenticate to Google Cloud using the CI service account. This sets
+      # GOOGLE_APPLICATION_CREDENTIALS, which the Firebase CLI picks up
+      # automatically for non-interactive auth — no `firebase login` needed.
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      # 9. Deploy to Firebase App Hosting
+      #
+      # Firebase App Hosting is Cloud Run-based: this command tells Firebase
+      # to build and roll out the latest commit on `main` using ITS OWN Cloud
+      # Build pipeline (not the artifact from the "Build" step above). The
+      # steps above are a fast-fail quality gate — they stop bad code before
+      # it ever reaches Firebase's build system.
+      - name: Deploy to Firebase App Hosting
+        run: |
+          npx firebase-tools apphosting:rollouts:create "$BACKEND_ID" \
+            --project "${{ secrets.FIREBASE_PROJECT_ID }}" \
+            --git-branch main \
+            --force
+
+      # 10. Print deployment URL
+      - name: Print deployment URL
+        run: |
+          URL=$(npx firebase-tools apphosting:backends:get "$BACKEND_ID" \
+            --project "${{ secrets.FIREBASE_PROJECT_ID }}" \
+            --json | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).result.uri")
+          echo "Deployment URL: $URL"
+          echo "### 🚀 Deployed to Firebase App Hosting" >> "$GITHUB_STEP_SUMMARY"
+          echo "**URL:** $URL" >> "$GITHUB_STEP_SUMMARY"
+
+      # 11. Display success message
+      - name: Success
+        run: echo "✅ Build validated and deployed successfully to Firebase App Hosting."
