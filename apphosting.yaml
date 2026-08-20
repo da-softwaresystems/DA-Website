@@ -19,10 +19,10 @@ env:
     availability:
       - RUNTIME
 
-  # TODO: replace with your real App Hosting URL (or custom domain) once the
-  # backend exists — used for the contact API's CORS header.
+  # Real App Hosting backend URL — used for the contact API's CORS header.
+  # Update this if you later attach a custom domain.
   - variable: SITE_URL
-    value: https://dasoftwaresystems.web.app
+    value: https://da-software-systems--dasoftwaresystems-d3c0d.us-central1.hosted.app
     availability:
       - RUNTIME
 
