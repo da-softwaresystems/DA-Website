@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
+import { privacyPolicy } from "@/data/legal";
 
-export const metadata = { title: "Privacy Policy", description: "Privacy Policy for Study Library Manager by DA Software Systems." };
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Privacy Policy for the Study Library Manager application by DA Software Systems.",
+  alternates: { canonical: "/privacy-policy" },
+};
 
-export default function PrivacyPolicy() { return <LegalPage title="Privacy Policy" subtitle="Study Library Manager application"><div className="space-y-7 text-slate-600 [&_h2]:mt-9 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-ink [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-6"><p><strong>Effective date:</strong> January 1, 2026</p><p>DA Software Systems built Study Library Manager as a commercial service for library administrators and staff to manage students, seat allocations, and payments.</p><h2>Information we collect</h2><p>The application may collect student names, phone numbers, seat allocation information, payment records, and library membership details entered by library administrators.</p><h2>How we use information</h2><ul><li>Manage student records, payments, and seat allocation</li><li>Provide library-management features</li><li>Improve the application’s reliability and performance</li></ul><h2>Data storage and security</h2><p>Application data may be stored using cloud infrastructure, including Google Firebase. We take reasonable measures to protect information, although no electronic transmission or storage method is completely secure.</p><h2>Third-party services</h2><p>We may use Google Firebase for cloud database and backend services. Those services operate under their own privacy policies.</p><h2>User control and children’s privacy</h2><p>Library administrators can update or delete records they manage. The application is not intended for children under 13, and we do not knowingly collect their personal information.</p><h2>Contact us</h2><p>For privacy questions, email <a className="font-semibold text-brand underline" href="mailto:dasoftwaresystems@gmail.com">dasoftwaresystems@gmail.com</a>.</p></div></LegalPage>; }
+export default function PrivacyPolicyPage() {
+  return <LegalPage document={privacyPolicy} />;
+}
